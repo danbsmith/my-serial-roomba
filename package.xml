@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>roomba_serial</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>My Roomba Serial Command Interface Package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 

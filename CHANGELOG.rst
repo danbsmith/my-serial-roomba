@@ -2,8 +2,8 @@
 Changelog for package roomba_serial
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2016-01-16)
+------------------
 * Catkin will now know to install roomba.py
   I added it to the list of scripts to copy to the install directory.
 * Initial commit of class and ROS stuff for roomba.
