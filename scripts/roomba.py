@@ -9,7 +9,7 @@ controller = SerialRoomba("/dev/ttyUSB0")
 class SerialRoomba:
     def __init__(self, port):
         global serialport
-        serialport = serial.Serial(port, baudrate = 57600, timeout = 10)
+        serialport = serial.Serial(port, baudrate = 115200, timeout = 10)
         serialport.setRTS(0)
         time.sleep(0.1)
         serialport.setRTS(1)
