@@ -128,7 +128,7 @@ def handle_sensor_request(data):
     else:
         rospy.loginfo("Received invalid sensor subset code.")
     global controller
-    controller.sendcommand(bytearray([142, data]))
+    controller.sendcommand(bytearray([142, data.request]))
     sensors = controller.getreply(incoming)
     resp = SensorsResponse()
     if data.request == 0:
