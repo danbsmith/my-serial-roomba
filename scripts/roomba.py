@@ -3,9 +3,8 @@
 import serial
 import rospy
 import time
-
-controller = SerialRoomba("/dev/ttyUSB0")
-
+from roomba_serial.msg import *
+from roomba_serial.srv import *
 class SerialRoomba:
     def __init__(self, port):
         global serialport
@@ -18,7 +17,7 @@ class SerialRoomba:
 
     def sendcommand(self, data):
         global serialport
-        serialport.write(command)
+        serialport.write(data)
         return
 
     def getreply(self, size):
@@ -30,29 +29,33 @@ class SerialRoomba:
         self.serialport.setBaudRate(rate)
         return
 
+controller = SerialRoomba("/dev/ttyUSB0")
+currmode = 0
 
 def ModeCallBack(data):
     modecode = data.modecode
     global currmode
     if modecode == 0:
-        cmd = list(chr(133))
+        cmd = [chr(133)]
         currmode = 0
     elif modecode == 2:
         if currmode == 1:
-            cmd = list(chr(130))
+            cmd = [chr(130)]
             currmode = 2
         elif currmode == 3:
-            cmd = list(chr(131))
+            cmd = [chr(131)]
             currmode = 2
         elif currmode == 2:
+            cmd = [chr(130)]
             return
-        else:
-            rospy.loginfo("Cannot go from current mode to safe mode")
+        elif currmode == 0:
+            rospy.loginfo("Can't enter safe mode without starting SCI!")
+            return
     elif modecode == 1:
-        cmd = list(chr(128))
-        currmode = 0
+        cmd = [chr(128)]
+        currmode = 1
     elif modecode == 3:
-        cmd = list(chr(132))
+        cmd = [chr(132)]
     else:
         rospy.loginfo("Bad mode code passed to serial controller")
         return
@@ -61,7 +64,7 @@ def ModeCallBack(data):
     return
 
 def BaudCallBack(data):
-    cmd = list(chr(129), chr(data.baudcode))
+    cmd = [chr(129), chr(data.baudcode)]
     global controller
     controller.sendcommand(cmd)
     if data.baudcode == 0:
@@ -97,14 +100,14 @@ def BaudCallBack(data):
 def DriveRoombaCallBack(data):
     radius = twoscomplement(data.radius)
     velocity = twoscomplement(data.velocity)
-    cmd = bytearray([137, velocity[0], velocity[1], radius[0], radius[1]])
+    cmd = [chr(137), chr(velocity[0]), chr(velocity[1]), chr(radius[0]), chr(radius[1])]
     global controller
     controller.sendcommand(cmd)
     return
 
 def SendButtonCallBack(data):
     global controller
-    controller.sendcommand(bytearray(data.buttoncode + 133))
+    controller.sendcommand(chr(data.buttoncode + 133))
     return
 
 def twoscomplement(num):
@@ -323,15 +326,16 @@ def handle_sensor_request(data):
             resp.temperature = sensors[5]
         resp.charge = (256 * sensors[6]) + sensors[7]
         resp.capacity = (256 * sensors[8]) + sensors[9]
-        return resp
+    return resp
 
 def serial_controller():
     rospy.init_node("roomba_controller", anonymous=True)
-    controller.sendcommand(bytearray([128])) # send start command
+    global currmode
+    currmode = 1
     rospy.Subscriber("BUTTON_OUT", SendButton, SendButtonCallBack)
     rospy.Subscriber("DRIVE_CMDS", DriveRoomba, DriveRoombaCallBack)
-    rospy.Subscriber("BAUD_CHANGES", SetBaud, SetBaudCallBack)
-    rospy.Subscriber("MODE_CHANGES", SetMode, SetModeCallBack)
+    rospy.Subscriber("BAUD_CHANGES", SetBaud, BaudCallBack)
+    rospy.Subscriber("MODE_CHANGES", SetMode, ModeCallBack)
     sensor_service = rospy.Service('GetSensors', Sensors, handle_sensor_request)
     rospy.spin()
 
