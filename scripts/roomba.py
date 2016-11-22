@@ -6,17 +6,21 @@ import time
 from roomba_serial.msg import *
 from roomba_serial.srv import *
 class SerialRoomba:
+    createtime = time.time()
     def __init__(self, port):
         global serialport
         serialport = serial.Serial(port, baudrate = 115200, timeout = 10)
-        serialport.setRTS(0)
-        time.sleep(0.1)
-        serialport.setRTS(1)
+        self.wakeSCI()
         time.sleep(2)
         rospy.loginfo("Initialized serial interface with Roomba")
 
     def sendcommand(self, data):
         global serialport
+        if((self.createtime - time.time()) > 600):
+            wakeSCI()
+            serialport.write([128])
+            self.createtime = time.time()
+            rospy.loginfo("Re-waking SCI")
         serialport.write(data)
         return
 
@@ -28,6 +32,13 @@ class SerialRoomba:
     def setbaud(self, rate):
         self.serialport.setBaudRate(rate)
         return
+
+    def wakeSCI(self):
+        global serialport
+        serialport.setRTS(0)
+        time.sleep(0.5)
+        serialport.setRTS(1)
+
 
 controller = SerialRoomba("/dev/ttyUSB0")
 currmode = 0
