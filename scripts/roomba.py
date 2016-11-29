@@ -10,19 +10,23 @@ class SerialRoomba:
     createtime = time.time()
     def __init__(self, port):
         global serialport
+        global currmode
         serialport = serial.Serial(port, baudrate = 115200, timeout = 10)
         self.wakeSCI()
         time.sleep(2)
         serialport.write([chr(128)])
+        currmode = 1
         rospy.loginfo("Initialized serial interface with Roomba")
 
     def sendcommand(self, data):
         global serialport
+        global currmode
         if((self.createtime - time.time()) > 600):
             wakeSCI()
             serialport.write([chr(128)])
+            currmode = 1
             self.createtime = time.time()
-            rospy.logdebug("Re-waking SCI")
+            rospy.logdebug("Re-waking SCI, set currmode to 1")
         serialport.write(data)
         return
 
@@ -343,7 +347,6 @@ def handle_sensor_request(data):
 def serial_controller():
     rospy.init_node("roomba_controller", anonymous=True)
     global currmode
-    currmode = 1
     rospy.Subscriber("BUTTON_OUT", SendButton, SendButtonCallBack)
     rospy.Subscriber("DRIVE_CMDS", DriveRoomba, DriveRoombaCallBack)
     rospy.Subscriber("BAUD_CHANGES", SetBaud, BaudCallBack)
