@@ -6,6 +6,8 @@ import time
 from roomba_serial.msg import *
 from roomba_serial.srv import *
 
+currmode = 0
+
 class SerialRoomba:
     createtime = time.time()
     def __init__(self, port):
@@ -46,7 +48,6 @@ class SerialRoomba:
         serialport.setRTS(1)
 
 controller = SerialRoomba("/dev/ttyUSB0")
-currmode = 0
 
 def ModeCallBack(data):
     modecode = data.modecode
