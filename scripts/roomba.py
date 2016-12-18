@@ -28,7 +28,7 @@ class SerialRoomba:
             serialport.write([chr(128)])
             currmode = 1
             self.createtime = time.time()
-            rospy.logdebug("Re-waking SCI, set currmode to 1")
+            rospy.loginfo("Re-waking SCI, set currmode to 1")
         serialport.write(data)
         return
 
