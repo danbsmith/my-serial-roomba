@@ -24,7 +24,7 @@ class SerialRoomba:
         global serialport
         global currmode
         if((self.createtime - time.time()) > 600):
-            wakeSCI()
+            self.wakeSCI()
             serialport.write([chr(128)])
             currmode = 1
             self.createtime = time.time()
