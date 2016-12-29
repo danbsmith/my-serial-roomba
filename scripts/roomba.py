@@ -23,12 +23,12 @@ class SerialRoomba:
     def sendcommand(self, data):
         global serialport
         global currmode
-        if((self.createtime - time.time()) > 600):
+	rospy.loginfo("Sending command %d at time %f with createtime %f, difference of %f", data, time.time(), self.createtime, (time.time() - self.createtime))
+        if((time.time() - self.createtime) > 600.0):
             self.wakeSCI()
             serialport.write([chr(128)])
             currmode = 1
             self.createtime = time.time()
-            rospy.loginfo("Re-waking SCI, set currmode to 1")
         serialport.write(data)
         return
 
@@ -46,6 +46,7 @@ class SerialRoomba:
         serialport.setRTS(0)
         time.sleep(0.5)
         serialport.setRTS(1)
+        rospy.loginfo("Re-waking SCI, set currmode to 1")
 
 controller = SerialRoomba("/dev/ttyUSB0")
 
