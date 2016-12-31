@@ -23,7 +23,7 @@ class SerialRoomba:
     def sendcommand(self, data):
         global serialport
         global currmode
-        rospy.loginfo("Sending command %d, current mode is %d", data[0], currmode)
+        rospy.loginfo("Sending command, current mode is %d", currmode)
         if((time.time() - self.createtime) > 600.0):
             self.wakeSCI()
             serialport.write([chr(128)])
