@@ -23,7 +23,7 @@ class SerialRoomba:
     def sendcommand(self, data):
         global serialport
         global currmode
-        rospy.loginfo("Sending command %u, current mode is %d", ord(data[0]), currmode)
+        rospy.loginfo("Sending command %u, current mode is %d", data[0], currmode)
         if((time.time() - self.createtime) > 600.0):
             self.wakeSCI()
             serialport.write([chr(128)])
@@ -58,26 +58,26 @@ def ModeCallBack(data):
     modecode = data.modecode
     global currmode
     if modecode == 0:
-        cmd = [chr(133)]
+        cmd = bytearray([chr(133)])
         currmode = 0
     elif modecode == 2:
         if currmode == 1:
-            cmd = [chr(130)]
+            cmd = bytearray([chr(130)])
             currmode = 2
         elif currmode == 3:
-            cmd = [chr(131)]
+            cmd = bytearray([chr(131)])
             currmode = 2
         elif currmode == 2:
-            cmd = [chr(130)]
+            cmd = bytearray([chr(130)])
             return
         elif currmode == 0:
             rospy.loginfo("Can't enter safe mode without starting SCI!")
             return
     elif modecode == 1:
-        cmd = [chr(128)]
+        cmd = bytearray([chr(128)])
         currmode = 1
     elif modecode == 3:
-        cmd = [chr(132)]
+        cmd = bytearray([chr(132)])
     else:
         rospy.loginfo("Bad mode code passed to serial controller")
         return
@@ -86,7 +86,7 @@ def ModeCallBack(data):
     return
 
 def BaudCallBack(data):
-    cmd = [chr(129), chr(data.baudcode)]
+    cmd = bytearray([chr(129), chr(data.baudcode)])
     global controller
     controller.sendcommand(cmd)
     if data.baudcode == 0:
@@ -122,14 +122,14 @@ def BaudCallBack(data):
 def DriveRoombaCallBack(data):
     radius = twoscomplement(data.radius)
     velocity = twoscomplement(data.velocity)
-    cmd = [chr(137), chr(velocity[0]), chr(velocity[1]), chr(radius[0]), chr(radius[1])]
+    cmd = bytearray([chr(137), chr(velocity[0]), chr(velocity[1]), chr(radius[0]), chr(radius[1])])
     global controller
     controller.sendcommand(cmd)
     return
 
 def SendButtonCallBack(data):
     global controller
-    controller.sendcommand(chr(data.buttoncode + 133))
+    controller.sendcommand(bytearray(chr(data.buttoncode + 133)))
     return
 
 def twoscomplement(num):
