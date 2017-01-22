@@ -16,17 +16,17 @@ class SerialRoomba:
         serialport = serial.Serial(port, baudrate = 115200, timeout = 10)
         self.wakeSCI()
         time.sleep(2)
-        serialport.write([chr(128)])
+        serialport.write(bytearray([chr(128)]))
         currmode = 1
         rospy.loginfo("Initialized serial interface with Roomba")
 
     def sendcommand(self, data):
         global serialport
         global currmode
-        rospy.loginfo("Sending command %u, current mode is %d", data[0], currmode)
+        #rospy.loginfo("Sending command %u, current mode is %d", data[0], currmode)
         if((time.time() - self.createtime) > 600.0):
             self.wakeSCI()
-            serialport.write([chr(128)])
+            serialport.write(bytearray([chr(128)]))
             currmode = 1
             self.createtime = time.time()
         serialport.write(data)
@@ -44,11 +44,11 @@ class SerialRoomba:
     def wakeSCI(self):
         global serialport
         serialport.setRTS(0)
-        time.sleep(0.1)
+        time.sleep(0.5)
         serialport.setRTS(1)
-	time.sleep(0.1)
+	time.sleep(0.5)
 	serialport.setRTS(0)
-	time.sleep(0.1)
+	time.sleep(0.5)
 	serialport.setRTS(1)
         rospy.loginfo("Re-waking SCI, set currmode to 1")
 
@@ -62,13 +62,13 @@ def ModeCallBack(data):
         currmode = 0
     elif modecode == 2:
         if currmode == 1:
-            cmd = bytearray([chr(130)])
+            cmd = bytearray([chr(131)])
             currmode = 2
         elif currmode == 3:
             cmd = bytearray([chr(131)])
             currmode = 2
         elif currmode == 2:
-            cmd = bytearray([chr(130)])
+            cmd = bytearray([chr(131)])
             return
         elif currmode == 0:
             rospy.loginfo("Can't enter safe mode without starting SCI!")
