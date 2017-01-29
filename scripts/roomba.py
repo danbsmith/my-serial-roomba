@@ -129,7 +129,7 @@ def DriveRoombaCallBack(data):
 
 def SendButtonCallBack(data):
     global controller
-    controller.sendcommand(bytearray(chr(data.buttoncode + 133)))
+    controller.sendcommand(bytearray([chr(data.buttoncode + 133)]))
     return
 
 def twoscomplement(num):
