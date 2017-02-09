@@ -26,8 +26,8 @@ class SerialRoomba:
         #rospy.loginfo("Sending command %u, current mode is %d", data[0], currmode)
         if((time.time() - self.createtime) > 300.0):
             self.wakeSCI()
-            serialport.write(bytearray([chr(128)]))
-            currmode = 1
+#            serialport.write(bytearray([chr(128)]))
+#            currmode = 1
             self.createtime = time.time()
         serialport.write(data)
         return
