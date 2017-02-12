@@ -42,8 +42,7 @@ class SerialRoomba:
         self.serialport.setBaudRate(rate)
         return
 
-    def wakeSCI(self):
-        global serialport
+    def wakeSCI(self): 
         global currmode
         oldmode = currmode
         rospy.loginfo("Beginning SCI Wake.")
