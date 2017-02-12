@@ -42,7 +42,7 @@ class SerialRoomba:
 
     def wakeSCI(self):
         global serialport
-	    global currmode
+        global currmode
         oldmode = currmode
         rospy.loginfo("Beginning SCI Wake.")
         serialport.setRTS(0)
@@ -356,6 +356,7 @@ def handle_sensor_request(data):
 def serial_controller():
     rospy.init_node("roomba_controller", anonymous=True)
     global currmode
+    rospy.loginfo("Starting roomba controller node.")
     rospy.Subscriber("BUTTON_OUT", SendButton, SendButtonCallBack)
     rospy.Subscriber("DRIVE_CMDS", DriveRoomba, DriveRoombaCallBack)
     rospy.Subscriber("BAUD_CHANGES", SetBaud, BaudCallBack)
