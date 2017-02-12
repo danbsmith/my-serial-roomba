@@ -13,6 +13,7 @@ class SerialRoomba:
     def __init__(self, port):
         global serialport
         global currmode
+        rospy.loginfo("Getting serial port")
         serialport = serial.Serial(port, baudrate = 115200, timeout = 10)
         self.wakeSCI()
         time.sleep(2)
