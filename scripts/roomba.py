@@ -41,16 +41,16 @@ class SerialRoomba:
 
     def wakeSCI(self):
         global serialport
-	global currmode
-	oldmode = currmode
+	    global currmode
+        oldmode = currmode
         serialport.setRTS(0)
         time.sleep(0.5)
         serialport.setRTS(1)
-	time.sleep(0.5)
-	serialport.write(bytearray([chr(128)]))
-	time.sleep(0.2)
-	serialport.write(bytearray([chr(129 + oldmode)])
-	currmode = oldmode
+        time.sleep(0.5)
+        serialport.write(bytearray([chr(128)]))
+        time.sleep(0.2)
+        serialport.write(bytearray([chr(129 + oldmode)])
+        currmode = oldmode
         rospy.loginfo("Re-waking SCI, set currmode to %d", oldmode)
 
 controller = SerialRoomba("/dev/ttyUSB0")
