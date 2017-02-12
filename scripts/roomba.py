@@ -27,6 +27,8 @@ class SerialRoomba:
         rospy.loginfo("Sending command %u, current mode is %d", data[0], currmode)
         if((time.time() - self.createtime) > 300.0):
             self.wakeSCI()
+            serialport.write(bytearray([chr(128)]))
+            currmode = 1
             self.createtime = time.time()
         serialport.write(data)
         return
@@ -51,7 +53,8 @@ class SerialRoomba:
         time.sleep(0.5)
         serialport.write(bytearray([chr(128)]))
         time.sleep(0.2)
-        serialport.write(bytearray([chr(129 + oldmode)])
+        if oldmode > 1:
+            serialport.write(bytearray([chr(129 + oldmode)]))
         currmode = oldmode
         rospy.loginfo("Woke SCI, set currmode to %d", oldmode)
 
@@ -356,9 +359,6 @@ def handle_sensor_request(data):
 def serial_controller():
     rospy.init_node("roomba_controller", anonymous=True)
     global currmode
-    global controller
-    rospy.loginfo("Starting roomba controller node.")
-    controller.init("/dev/ttyUSB0")
     rospy.Subscriber("BUTTON_OUT", SendButton, SendButtonCallBack)
     rospy.Subscriber("DRIVE_CMDS", DriveRoomba, DriveRoombaCallBack)
     rospy.Subscriber("BAUD_CHANGES", SetBaud, BaudCallBack)
