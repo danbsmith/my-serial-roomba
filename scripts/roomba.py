@@ -10,7 +10,7 @@ currmode = 0
 
 class SerialRoomba:
     createtime = time.time()
-    def __init__(self, port):
+    def init(self, port):
         global serialport
         global currmode
         rospy.loginfo("Getting serial port")
@@ -55,7 +55,7 @@ class SerialRoomba:
         currmode = oldmode
         rospy.loginfo("Woke SCI, set currmode to %d", oldmode)
 
-controller = SerialRoomba("/dev/ttyUSB0")
+controller = SerialRoomba()
 
 def ModeCallBack(data):
     modecode = data.modecode
@@ -356,7 +356,9 @@ def handle_sensor_request(data):
 def serial_controller():
     rospy.init_node("roomba_controller", anonymous=True)
     global currmode
+    global controller
     rospy.loginfo("Starting roomba controller node.")
+    controller.init("/dev/ttyUSB0")
     rospy.Subscriber("BUTTON_OUT", SendButton, SendButtonCallBack)
     rospy.Subscriber("DRIVE_CMDS", DriveRoomba, DriveRoombaCallBack)
     rospy.Subscriber("BAUD_CHANGES", SetBaud, BaudCallBack)
