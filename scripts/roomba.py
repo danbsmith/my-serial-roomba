@@ -10,32 +10,25 @@ currmode = 0
 
 class SerialRoomba:
     createtime = time.time()
-    def init(self, port):
-        global serialport
+    serialport = serial.Serial()
+    def __init__(self, port):
         global currmode
         rospy.loginfo("Getting serial port")
-        serialport = serial.Serial(port, baudrate = 115200, timeout = 10)
+        self.serialport = serial.Serial(port, baudrate = 115200, timeout = 10)
         self.wakeSCI()
-        time.sleep(2)
-        serialport.write(bytearray([chr(128)]))
-        currmode = 1
         rospy.loginfo("Initialized serial interface with Roomba")
 
     def sendcommand(self, data):
-        global serialport
         global currmode
         rospy.loginfo("Sending command %u, current mode is %d", data[0], currmode)
         if((time.time() - self.createtime) > 300.0):
             self.wakeSCI()
-            serialport.write(bytearray([chr(128)]))
-            currmode = 1
             self.createtime = time.time()
-        serialport.write(data)
+        self.serialport.write(data)
         return
 
     def getreply(self, size):
-        global serialport
-        reply = bytearray(serialport.read(size))
+        reply = bytearray(self.serialport.read(size))
         return reply
 
     def setbaud(self, rate):
@@ -46,18 +39,18 @@ class SerialRoomba:
         global currmode
         oldmode = currmode
         rospy.loginfo("Beginning SCI Wake.")
-        serialport.setRTS(0)
+        self.serialport.setRTS(0)
         time.sleep(0.5)
-        serialport.setRTS(1)
+        self.serialport.setRTS(1)
         time.sleep(0.5)
-        serialport.write(bytearray([chr(128)]))
+        self.serialport.write(bytearray([chr(128)]))
         time.sleep(0.2)
         if oldmode > 1:
-            serialport.write(bytearray([chr(129 + oldmode)]))
+            self.serialport.write(bytearray([chr(129 + oldmode)]))
         currmode = oldmode
         rospy.loginfo("Woke SCI, set currmode to %d", oldmode)
 
-controller = SerialRoomba()
+controller = SerialRoomba("/dev/ttyUSB0")
 
 def ModeCallBack(data):
     modecode = data.modecode
