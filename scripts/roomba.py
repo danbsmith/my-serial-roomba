@@ -47,6 +47,8 @@ class SerialRoomba:
         time.sleep(0.2)
         if oldmode > 1:
             self.serialport.write(bytearray([chr(129 + oldmode)]))
+        else:
+            oldmode = 1
         currmode = oldmode
         rospy.loginfo("Woke SCI, set currmode to %d", oldmode)
 
